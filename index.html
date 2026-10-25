@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SEMS Ingeniería Estructural</title>
+<meta name="description" content="SEMS: diseño estructural de casa habitación, optimización de flujos de trabajo con IA para ingenieros y software de diseño conforme a normas vigentes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="icon" type="image/png" href="assets/sems-mark.png">
+<style>
+html,body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+/* Layout: plano estructural. Hero oscuro con la imagen de fondo, secciones claras sobre retícula de ejes (A–D / 1–4), cotas como separadores. */
+:root {
+  --ink: #0d1e36;          /* azul marino del logotipo */
+  --steel: #2c62a0;        /* azul acero del logotipo */
+  --glow: #48b8ec;         /* cian de la imagen de fondo */
+  --concrete: #8a94a2;     /* gris concreto */
+  --paper: #f3f6fa;        /* fondo claro */
+  --surface: #ffffff;
+  --fg: #12233b;
+  --muted: #55657a;
+  --line: #d5dee9;
+  --grid: rgba(44, 98, 160, .07);
+  --hero-bg: #08162a;
+  --hero-fg: #eaf2fb;
+  --hero-muted: #a9bbd1;
+  --header-bg: rgba(255, 255, 255, .86);
+  --accent-fg: #ffffff;
+  --ok: #1d7a4f;
+  --err: #b3261e;
+
+  --f-display: "Saira", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --s-1: .25rem; --s-2: .5rem; --s-3: .75rem; --s-4: 1rem; --s-5: 1.5rem; --s-6: 2rem; --s-7: 3rem; --s-8: 4.5rem; --s-9: 6.5rem;
+  --radius: 4px;
+  --maxw: 1180px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0a1424; --surface: #102038; --fg: #e3ecf7; --muted: #9db0c7; --line: #22385a;
+    --grid: rgba(72, 184, 236, .06); --header-bg: rgba(10, 20, 36, .86); --ink: #e3ecf7; --steel: #5b93d6;
+    --hero-bg: #050e1c; --ok: #5cc596; --err: #ff8a80; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0a1424; --surface: #102038; --fg: #e3ecf7; --muted: #9db0c7; --line: #22385a;
+  --grid: rgba(72, 184, 236, .06); --header-bg: rgba(10, 20, 36, .86); --ink: #e3ecf7; --steel: #5b93d6;
+  --hero-bg: #050e1c; --ok: #5cc596; --err: #ff8a80; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
+body { background: var(--paper); color: var(--fg); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: var(--header-bg); }
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.08; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.label { font-family: var(--f-mono); font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--steel); }
+
+/* Botones */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .6em; font-family: var(--f-display); font-weight: 600; font-size: 1rem; letter-spacing: .02em; padding: .85em 1.4em; border-radius: var(--radius); border: 1.5px solid transparent; text-decoration: none; cursor: pointer; transition: background .2s, border-color .2s, transform .2s, color .2s; }
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--steel); color: var(--accent-fg); }
+.btn-primary:hover { background: #3a76bd; }
+.btn-ghost { border-color: rgba(234, 242, 251, .4); color: var(--hero-fg); background: rgba(8, 22, 42, .35); }
+.btn-ghost:hover { border-color: var(--glow); color: #fff; }
+.btn-line { border-color: var(--steel); color: var(--steel); background: transparent; }
+.btn-line:hover { background: var(--steel); color: var(--accent-fg); }
+.btn svg { width: 1.1em; height: 1.1em; }
+
+/* Encabezado */
+.site-header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50; background: var(--header-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+.site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: var(--s-5); min-height: 68px; }
+.brand { display: flex; align-items: center; gap: .7rem; text-decoration: none; }
+.brand img { height: 38px; width: auto; }
+.brand-name { font-family: var(--f-display); font-weight: 800; font-size: 1.45rem; letter-spacing: .08em; color: var(--ink); line-height: 1; }
+.brand-name small { display: block; font-family: var(--f-mono); font-weight: 400; font-size: .56rem; letter-spacing: .16em; color: var(--muted); margin-top: .3rem; }
+.nav { display: flex; align-items: center; gap: var(--s-5); }
+.nav a { text-decoration: none; font-weight: 500; font-size: .95rem; color: var(--muted); }
+.nav a:hover { color: var(--fg); }
+.nav .btn { padding: .6em 1.1em; font-size: .92rem; color: var(--accent-fg); }
+.menu-btn { display: none; background: none; border: 1px solid var(--line); border-radius: var(--radius); padding: .5rem; color: var(--fg); cursor: pointer; }
+.menu-btn svg { width: 22px; height: 22px; display: block; }
+@media (max-width: 880px) {
+  .menu-btn { display: block; }
+  .nav { position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 0; background: var(--surface); border-bottom: 1px solid var(--line); padding: var(--s-2) max(20px, env(safe-area-inset-right, 0px)) var(--s-4) max(20px, env(safe-area-inset-left, 0px)); }
+  .nav[data-open="false"] { display: none; }
+  .nav a { padding: .8rem 0; border-bottom: 1px solid var(--line); }
+  .nav .btn { margin-top: var(--s-3); }
+}
+
+/* Hero */
+.hero { position: relative; background: var(--hero-bg); color: var(--hero-fg); overflow: hidden; isolation: isolate; }
+.hero-bg { position: absolute; inset: 0; z-index: -2; background-image: url("assets/fondo.jpg"); background-size: cover; background-position: 62% center; }
+.hero::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(5, 14, 28, .95) 0%, rgba(5, 14, 28, .86) 38%, rgba(5, 14, 28, .35) 75%, rgba(5, 14, 28, .2) 100%), linear-gradient(0deg, rgba(5, 14, 28, .85) 0%, rgba(5, 14, 28, 0) 35%); }
+.hero .wrap { padding-block: clamp(4rem, 10vw, 7.5rem) clamp(3rem, 7vw, 5rem); display: grid; gap: var(--s-6); }
+.hero .label { color: var(--glow); }
+.hero h1 { font-size: clamp(2.4rem, 6vw, 4.6rem); font-weight: 700; max-width: 15ch; }
+.hero h1 em { font-style: normal; color: var(--glow); }
+.hero-lead { font-size: clamp(1.05rem, 1.6vw, 1.25rem); color: var(--hero-muted); max-width: 54ch; }
+.hero-ctas { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+.codes { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); font-family: var(--f-mono); font-size: .8rem; color: var(--hero-muted); border-top: 1px solid rgba(169, 187, 209, .25); padding-top: var(--s-4); margin-top: var(--s-4); max-width: 760px; }
+.codes span::before { content: "▸ "; color: var(--glow); }
+
+/* Selector de perfil, sale del hero */
+.paths { position: relative; z-index: 2; margin-top: calc(-1 * var(--s-6)); }
+.paths-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: 0 18px 40px -20px rgba(8, 22, 42, .45); }
+.path { background: var(--surface); padding: var(--s-6) var(--s-5); display: flex; flex-direction: column; gap: var(--s-3); text-decoration: none; transition: background .2s; min-width: 0; }
+.path:hover { background: color-mix(in srgb, var(--surface) 92%, var(--glow)); }
+.path .who { font-family: var(--f-mono); font-size: .76rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.path h3 { font-size: 1.4rem; font-weight: 700; color: var(--ink); }
+.path p { color: var(--muted); font-size: .98rem; }
+.path .go { margin-top: auto; padding-top: var(--s-2); font-family: var(--f-display); font-weight: 600; color: var(--steel); display: inline-flex; align-items: center; gap: .4em; }
+.path:hover .go svg { transform: translateX(4px); }
+.path .go svg { width: 1em; height: 1em; transition: transform .2s; }
+.path-icon { width: 44px; height: 44px; color: var(--steel); }
+@media (max-width: 860px) { .paths-grid { grid-template-columns: 1fr; } }
+
+/* Secciones */
+section.block { padding-block: var(--s-9); position: relative; }
+.blueprint { background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 32px 32px; }
+.sec-head { display: grid; gap: var(--s-3); max-width: 760px; margin-bottom: var(--s-7); }
+.sec-head h2 { font-size: clamp(1.9rem, 4vw, 2.9rem); font-weight: 700; color: var(--ink); }
+.sec-head p { color: var(--muted); font-size: 1.1rem; max-width: 62ch; }
+.axis { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border: 1.5px solid var(--steel); border-radius: 50%; font-family: var(--f-mono); font-size: .85rem; font-weight: 500; color: var(--steel); flex: none; }
+.eyebrow { display: flex; align-items: center; gap: var(--s-3); }
+
+/* Cota (separador) */
+.dim { display: flex; align-items: center; gap: var(--s-3); color: var(--concrete); font-family: var(--f-mono); font-size: .75rem; letter-spacing: .1em; }
+.dim::before, .dim::after { content: ""; flex: 1; height: 1px; background: currentColor; opacity: .5; }
+.dim span { text-align: center; min-width: 0; }
+@media (max-width: 480px) { .brand-name small { display: none; } }
+
+/* Residencial */
+.split { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: var(--s-8); align-items: start; }
+@media (max-width: 920px) { .split { grid-template-columns: 1fr; gap: var(--s-7); } }
+.deliverables { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+.deliverables li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-4); padding: var(--s-4) 0; border-bottom: 1px solid var(--line); }
+.deliverables .code { font-family: var(--f-mono); font-size: .8rem; color: var(--steel); padding-top: .2rem; min-width: 3.4rem; }
+.deliverables strong { display: block; font-weight: 600; }
+.deliverables span.d { color: var(--muted); font-size: .95rem; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-5); counter-reset: step; }
+.steps li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-4); align-items: start; counter-increment: step; }
+.steps li::before { content: counter(step); display: inline-flex; align-items: center; justify-content: center; width: 2.2rem; height: 2.2rem; border: 1.5px solid var(--steel); border-radius: 50%; font-family: var(--f-mono); color: var(--steel); background: var(--paper); }
+.steps h3 { font-size: 1.15rem; font-weight: 600; color: var(--ink); margin-bottom: .2rem; }
+.steps p { color: var(--muted); font-size: .97rem; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s-6); display: grid; gap: var(--s-5); }
+.panel h3.ph { font-size: 1.25rem; color: var(--ink); }
+
+/* IA (banda oscura) */
+.dark-band { background: var(--hero-bg); color: var(--hero-fg); }
+.dark-band .sec-head h2 { color: var(--hero-fg); }
+.dark-band .sec-head p { color: var(--hero-muted); }
+.dark-band .label { color: var(--glow); }
+.dark-band .axis { border-color: var(--glow); color: var(--glow); }
+.flows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5); }
+@media (max-width: 760px) { .flows { grid-template-columns: 1fr; } }
+.flow { border: 1px solid rgba(169, 187, 209, .22); border-radius: var(--radius); padding: var(--s-5); display: grid; gap: var(--s-3); background: rgba(255, 255, 255, .02); align-content: start; }
+.flow h3 { font-size: 1.2rem; font-weight: 600; }
+.flow p { color: var(--hero-muted); font-size: .97rem; }
+.flow .before-after { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: var(--s-2); align-items: center; font-family: var(--f-mono); font-size: .8rem; margin-top: var(--s-2); }
+.flow .ba { padding: .5rem .6rem; border-radius: var(--radius); border: 1px dashed rgba(169, 187, 209, .35); color: var(--hero-muted); min-width: 0; }
+.flow .ba.after { border-style: solid; border-color: var(--glow); color: var(--hero-fg); }
+.flow .arrow { color: var(--glow); }
+.ia-cta { margin-top: var(--s-7); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-5); padding: var(--s-5) var(--s-6); border: 1px solid var(--glow); border-radius: var(--radius); background: rgba(72, 184, 236, .06); }
+.ia-cta p { max-width: 56ch; color: var(--hero-fg); font-size: 1.05rem; }
+
+/* Software */
+.products { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-5); }
+@media (max-width: 980px) { .products { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .products { grid-template-columns: 1fr; } }
+.product { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); display: flex; flex-direction: column; min-width: 0; transition: border-color .2s, transform .2s; }
+.product:hover { border-color: var(--steel); transform: translateY(-2px); }
+.product-top { padding: var(--s-5); display: grid; gap: var(--s-3); border-bottom: 1px solid var(--line); }
+.norm { display: inline-block; justify-self: start; font-family: var(--f-mono); font-size: .74rem; letter-spacing: .06em; color: var(--steel); border: 1px solid var(--steel); border-radius: 2px; padding: .15rem .45rem; }
+.product h3 { font-size: 1.25rem; font-weight: 700; color: var(--ink); }
+.product p { color: var(--muted); font-size: .95rem; }
+.product ul { list-style: none; margin: 0; padding: var(--s-4) var(--s-5); display: grid; gap: .45rem; font-size: .93rem; flex: 1; }
+.product li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .55rem; }
+.product li::before { content: ""; width: .5rem; height: .5rem; margin-top: .55rem; background: var(--glow); border-radius: 1px; }
+.product-foot { padding: var(--s-4) var(--s-5) var(--s-5); display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); flex-wrap: wrap; }
+.price { font-family: var(--f-mono); font-size: .9rem; color: var(--muted); }
+.price b { font-family: var(--f-display); font-size: 1.25rem; color: var(--fg); font-weight: 700; }
+.product .btn { padding: .55em 1em; font-size: .9rem; }
+.soft-note { margin-top: var(--s-5); color: var(--muted); font-size: .95rem; }
+
+/* Por qué SEMS */
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-5); }
+@media (max-width: 900px) { .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .facts { grid-template-columns: 1fr; } }
+.fact { display: grid; gap: var(--s-2); padding-top: var(--s-4); border-top: 2px solid var(--steel); }
+.fact h3 { font-size: 1.1rem; font-weight: 600; color: var(--ink); }
+.fact p { color: var(--muted); font-size: .95rem; }
+
+/* FAQ */
+.faq { display: grid; gap: 0; border-top: 1px solid var(--line); max-width: 860px; }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: var(--s-4); padding: var(--s-4) 0; font-weight: 600; font-size: 1.05rem; color: var(--ink); }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-family: var(--f-mono); font-size: 1.3rem; color: var(--steel); transition: transform .2s; }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { padding-bottom: var(--s-4); color: var(--muted); max-width: 70ch; }
+
+/* Contacto */
+.contact-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: var(--s-8); align-items: start; }
+@media (max-width: 920px) { .contact-grid { grid-template-columns: 1fr; gap: var(--s-6); } }
+.contact-list { list-style: none; margin: var(--s-5) 0 0; padding: 0; display: grid; gap: var(--s-4); }
+.contact-list li { display: grid; gap: .1rem; }
+.contact-list .k { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.contact-list .v { font-weight: 600; font-size: 1.05rem; user-select: all; overflow-wrap: anywhere; }
+.form { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s-6); display: grid; gap: var(--s-4); }
+.tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.tabs button { font: inherit; font-size: .88rem; font-weight: 600; padding: .7rem .5rem; background: transparent; color: var(--muted); border: 0; border-right: 1px solid var(--line); cursor: pointer; line-height: 1.25; }
+.tabs button:last-child { border-right: 0; }
+.tabs button[aria-pressed="true"] { background: var(--steel); color: var(--accent-fg); }
+@media (max-width: 520px) { .tabs { grid-template-columns: 1fr; } .tabs button { border-right: 0; border-bottom: 1px solid var(--line); } .tabs button:last-child { border-bottom: 0; } }
+.row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); }
+@media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
+.field { display: grid; gap: .35rem; min-width: 0; }
+.field label { font-size: .88rem; font-weight: 600; }
+.field label .opt { font-weight: 400; color: var(--muted); }
+.field input, .field select, .field textarea { font: inherit; font-size: 1rem; padding: .7rem .8rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); color: var(--fg); width: 100%; }
+.field textarea { min-height: 110px; resize: vertical; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--steel); box-shadow: 0 0 0 3px color-mix(in srgb, var(--steel) 22%, transparent); }
+.field .err { color: var(--err); font-size: .82rem; }
+.field[data-invalid="true"] input, .field[data-invalid="true"] select, .field[data-invalid="true"] textarea { border-color: var(--err); }
+.form-note { font-size: .85rem; color: var(--muted); }
+.result { border: 1px solid var(--ok); border-radius: var(--radius); padding: var(--s-5); display: grid; gap: var(--s-3); }
+.result h3 { font-size: 1.15rem; color: var(--ok); }
+.result p { color: var(--muted); font-size: .95rem; }
+.result .acts { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+.result .btn { padding: .6em 1.1em; font-size: .92rem; }
+
+/* Pie */
+.site-footer { background: var(--hero-bg); color: var(--hero-muted); }
+.site-footer .wrap { padding-block: var(--s-7) var(--s-6); display: grid; gap: var(--s-6); }
+.foot-top { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr)); gap: var(--s-6); }
+@media (max-width: 760px) { .foot-top { grid-template-columns: 1fr; } }
+.foot-brand img { height: 46px; width: auto; }
+.foot-brand p { margin-top: var(--s-3); max-width: 38ch; font-size: .95rem; }
+.site-footer h4 { margin: 0 0 var(--s-3); font-family: var(--f-mono); font-weight: 500; font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--glow); }
+.site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .45rem; font-size: .95rem; }
+.site-footer a { text-decoration: none; }
+.site-footer a:hover { color: var(--hero-fg); }
+.foot-bottom { border-top: 1px solid rgba(169, 187, 209, .2); padding-top: var(--s-4); display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s-3); font-size: .85rem; font-family: var(--f-mono); }
+
+/* Placeholder visible para datos pendientes */
+.ph-data { background: color-mix(in srgb, var(--glow) 18%, transparent); border-radius: 2px; padding: 0 .25em; }
+
+/* Entrada del hero */
+@keyframes rise { from { transform: translateY(14px); opacity: .001; } to { transform: none; opacity: 1; } }
+.hero .wrap > * { animation: rise .7s cubic-bezier(.2, .7, .2, 1) both; }
+.hero .wrap > *:nth-child(2) { animation-delay: .08s; }
+.hero .wrap > *:nth-child(3) { animation-delay: .16s; }
+.hero .wrap > *:nth-child(4) { animation-delay: .24s; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#inicio" aria-label="SEMS, inicio">
+      <img src="assets/sems-mark.png" alt="" width="56" height="38">
+      <span class="brand-name">SEMS<small>STRUCTURAL ENGINEERING MANAGEMENT SYSTEMS</small></span>
+    </a>
+    <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav class="nav" id="nav" data-open="false">
+      <a href="#casa">Diseño de casa</a>
+      <a href="#ia">IA para ingenieros</a>
+      <a href="#software">Software</a>
+      <a href="#faq">Preguntas</a>
+      <a class="btn btn-primary" href="#contacto" data-perfil="casa">Solicitar cotización</a>
+    </nav>
+  </div>
+</header>
+
+<main id="inicio">
+  <section class="hero">
+    <div class="hero-bg" role="img" aria-label="Puente y edificio con modelo estructural y análisis por elemento finito superpuestos"></div>
+    <div class="wrap">
+      <span class="label">Ingeniería · Estructuras · Gestión</span>
+      <h1>Estructuras bien calculadas. <em>Ingeniería que trabaja más rápido.</em></h1>
+      <p class="hero-lead">En SEMS diseñamos la estructura de tu casa con planos listos para trámite, ayudamos a despachos de ingeniería a automatizar su trabajo con inteligencia artificial y desarrollamos software de diseño conforme a las normas vigentes.</p>
+      <div>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="#contacto" data-perfil="casa">Cotizar mi proyecto
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <a class="btn btn-ghost" href="#servicios">Ver servicios</a>
+        </div>
+        <div class="codes" aria-label="Normas de referencia">
+          <span>NTC-2023 CDMX</span><span>ACI 318-19</span><span>AISC 360-22</span><span>MDOC CFE Sismo y Viento</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="paths" id="servicios">
+    <div class="wrap">
+      <div class="paths-grid">
+        <a class="path" href="#casa">
+          <svg class="path-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 22 24 8l18 14"/><path d="M11 18v22h26V18"/><path d="M11 30h26M24 18v22"/></svg>
+          <span class="who">Para propietarios</span>
+          <h3>Diseño estructural de casa habitación</h3>
+          <p>Cálculo, memoria y planos estructurales firmados para construir o ampliar tu casa con seguridad.</p>
+          <span class="go">Quiero cotizar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </a>
+        <a class="path" href="#ia">
+          <svg class="path-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10" cy="24" r="4"/><circle cx="38" cy="12" r="4"/><circle cx="38" cy="36" r="4"/><circle cx="24" cy="24" r="5"/><path d="M14 24h5M28 22l6-7M28 26l6 7"/></svg>
+          <span class="who">Para ingenieros y despachos</span>
+          <h3>Optimización de flujos de trabajo con IA</h3>
+          <p>Automatizamos memorias, revisiones y reportes para que tu equipo dedique su tiempo a decidir, no a capturar.</p>
+          <span class="go">Agendar diagnóstico <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </a>
+        <a class="path" href="#software">
+          <svg class="path-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="6" y="9" width="36" height="26" rx="2"/><path d="M18 41h12M24 35v6"/><path d="M13 28l6-10 5 6 4-4 7 8"/></svg>
+          <span class="who">Para ingenieros</span>
+          <h3>Software de diseño según norma</h3>
+          <p>Herramientas puntuales y verificables para diseñar elementos estructurales conforme a la normativa vigente.</p>
+          <span class="go">Ver herramientas <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Eje A: Casa habitación -->
+  <section class="block blueprint" id="casa">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow"><span class="axis">A</span><span class="label">Diseño estructural residencial</span></div>
+        <h2>Tu casa, calculada para durar</h2>
+        <p>Ya sea una casa nueva, un segundo nivel o una ampliación, entregamos el proyecto estructural completo que te pide la licencia de construcción y que tu constructor necesita en obra.</p>
+      </div>
+      <div class="split">
+        <div class="panel">
+          <h3 class="ph">Qué recibes</h3>
+          <ul class="deliverables">
+            <li><span class="code">E-01</span><div><strong>Planos de cimentación</strong><span class="d">Zapatas, losas o contratrabes según el estudio de mecánica de suelos.</span></div></li>
+            <li><span class="code">E-02</span><div><strong>Planos de losas y trabes</strong><span class="d">Armados, cortes y detalles constructivos listos para obra.</span></div></li>
+            <li><span class="code">E-03</span><div><strong>Columnas, muros y castillos</strong><span class="d">Mampostería confinada, concreto o acero, según tu proyecto.</span></div></li>
+            <li><span class="code">MC</span><div><strong>Memoria de cálculo</strong><span class="d">Análisis por cargas gravitacionales, sismo y viento conforme al reglamento local.</span></div></li>
+            <li><span class="code">DRO</span><div><strong>Apoyo en trámite</strong><span class="d">Firma de responsable y acompañamiento ante la autoridad cuando aplica.</span></div></li>
+          </ul>
+          <a class="btn btn-primary" href="#contacto" data-perfil="casa">Cotizar diseño de mi casa</a>
+        </div>
+        <div>
+          <span class="label">Cómo trabajamos</span>
+          <ol class="steps" style="margin-top: var(--s-5)">
+            <li><div><h3>Nos compartes tu proyecto</h3><p>Planos arquitectónicos, croquis o fotos del terreno. Si aún no tienes arquitectónico, te orientamos.</p></div></li>
+            <li><div><h3>Cotización en 48 horas</h3><p>Precio cerrado según metros cuadrados, niveles y sistema constructivo.</p></div></li>
+            <li><div><h3>Análisis y diseño</h3><p>Modelamos la estructura, revisamos sismo y viento y optimizamos materiales para no sobrediseñar.</p></div></li>
+            <li><div><h3>Entrega y seguimiento</h3><p>Recibes planos en PDF y DWG, memoria de cálculo y resolvemos dudas de tu constructor durante la obra.</p></div></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Eje B: IA -->
+  <section class="block dark-band" id="ia">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow"><span class="axis">B</span><span class="label">Inteligencia artificial para ingeniería</span></div>
+        <h2>Menos captura, más ingeniería</h2>
+        <p>Analizamos cómo trabaja tu despacho y construimos flujos con IA que se conectan a tus hojas de cálculo, programas de análisis y plantillas. Tú conservas el criterio; la máquina hace lo repetitivo.</p>
+      </div>
+      <div class="flows">
+        <article class="flow">
+          <h3>Memorias de cálculo automáticas</h3>
+          <p>Generamos la memoria a partir de los resultados de tu modelo, con tu formato y tus firmas.</p>
+          <div class="before-after"><span class="ba">Copiar tablas a Word</span><span class="arrow">→</span><span class="ba after">Documento listo para revisión</span></div>
+        </article>
+        <article class="flow">
+          <h3>Revisión de planos y especificaciones</h3>
+          <p>Un asistente que compara planos contra la memoria y la norma y marca inconsistencias antes de entregar.</p>
+          <div class="before-after"><span class="ba">Revisión manual hoja por hoja</span><span class="arrow">→</span><span class="ba after">Lista de observaciones priorizada</span></div>
+        </article>
+        <article class="flow">
+          <h3>Asistente de normativa</h3>
+          <p>Consulta en lenguaje natural sobre NTC, ACI o AISC con la cláusula citada, entrenado con los documentos de tu despacho.</p>
+          <div class="before-after"><span class="ba">Buscar en PDFs de 400 páginas</span><span class="arrow">→</span><span class="ba after">Respuesta con referencia exacta</span></div>
+        </article>
+        <article class="flow">
+          <h3>Cotizaciones y gestión de proyectos</h3>
+          <p>Estimación de honorarios, control de entregables y reportes de avance generados a partir de tus datos.</p>
+          <div class="before-after"><span class="ba">Hojas sueltas y correos</span><span class="arrow">→</span><span class="ba after">Tablero único del despacho</span></div>
+        </article>
+      </div>
+      <div class="ia-cta">
+        <p>Empezamos con un diagnóstico de tu flujo actual y te proponemos las automatizaciones con mayor retorno.</p>
+        <a class="btn btn-primary" href="#contacto" data-perfil="ia">Agendar diagnóstico</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Eje C: Software -->
+  <section class="block blueprint" id="software">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow"><span class="axis">C</span><span class="label">Software especializado</span></div>
+        <h2>Herramientas de diseño que puedes verificar</h2>
+        <p>Programas pequeños y enfocados: haces una tarea, ves cada fórmula y la cláusula que la respalda, y exportas un reporte para tu memoria.</p>
+      </div>
+      <div class="products">
+        <article class="product">
+          <div class="product-top">
+            <span class="norm">NTC-Concreto 2023 · ACI 318-19</span>
+            <h3>Trabes y losas de concreto</h3>
+            <p>Diseño por flexión y cortante de trabes y losas en una y dos direcciones.</p>
+          </div>
+          <ul>
+            <li>Cálculo de acero mínimo, máximo y por temperatura</li>
+            <li>Revisión de deflexiones y agrietamiento</li>
+            <li>Reporte en PDF con referencias a la norma</li>
+          </ul>
+          <div class="product-foot"><span class="price">Desde <b>$ —</b></span><a class="btn btn-line" href="#contacto" data-perfil="software" data-producto="Trabes y losas de concreto">Solicitar licencia</a></div>
+        </article>
+        <article class="product">
+          <div class="product-top">
+            <span class="norm">NTC-Mampostería 2023</span>
+            <h3>Muros de mampostería</h3>
+            <p>Revisión de muros confinados por carga vertical, sismo y cortante.</p>
+          </div>
+          <ul>
+            <li>Método simplificado y revisión por densidad de muros</li>
+            <li>Diseño de castillos y dalas</li>
+            <li>Ideal para casa habitación de 1 a 3 niveles</li>
+          </ul>
+          <div class="product-foot"><span class="price">Desde <b>$ —</b></span><a class="btn btn-line" href="#contacto" data-perfil="software" data-producto="Muros de mampostería">Solicitar licencia</a></div>
+        </article>
+        <article class="product">
+          <div class="product-top">
+            <span class="norm">MDOC CFE · NTC-Sismo</span>
+            <h3>Espectros de diseño sísmico</h3>
+            <p>Genera espectros de diseño por ubicación y tipo de suelo en segundos.</p>
+          </div>
+          <ul>
+            <li>Factores de comportamiento y sobrerresistencia</li>
+            <li>Exportación a tu programa de análisis</li>
+            <li>Gráficas listas para la memoria de cálculo</li>
+          </ul>
+          <div class="product-foot"><span class="price">Desde <b>$ —</b></span><a class="btn btn-line" href="#contacto" data-perfil="software" data-producto="Espectros de diseño sísmico">Solicitar licencia</a></div>
+        </article>
+      </div>
+      <p class="soft-note">¿Necesitas una herramienta a la medida de tu despacho? También desarrollamos software personalizado. <a href="#contacto" data-perfil="software">Cuéntanos qué necesitas</a>.</p>
+    </div>
+  </section>
+
+  <div class="wrap"><div class="dim"><span>SEMS · ESTRUCTURAS SEGURAS · PROCESOS EFICIENTES</span></div></div>
+
+  <!-- Por qué SEMS -->
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="eyebrow"><span class="axis">D</span><span class="label">Por qué SEMS</span></div>
+        <h2>Ingenieros que también construyen software</h2>
+      </div>
+      <div class="facts">
+        <div class="fact"><h3>Normativa al día</h3><p>Diseñamos con las ediciones vigentes de las normas mexicanas e internacionales.</p></div>
+        <div class="fact"><h3>Precio cerrado</h3><p>Sabes cuánto pagas desde el inicio, sin cargos sorpresa a mitad del proyecto.</p></div>
+        <div class="fact"><h3>Diseño optimizado</h3><p>Un buen cálculo evita sobrediseñar y ahorra acero y concreto en obra.</p></div>
+        <div class="fact"><h3>Trato directo</h3><p>Hablas con el ingeniero que calcula tu proyecto, no con un intermediario.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="block blueprint" id="faq" style="padding-top: var(--s-7)">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="label">Preguntas frecuentes</span>
+        <h2>Lo que más nos preguntan</h2>
+      </div>
+      <div class="faq">
+        <details><summary>¿Qué necesito para cotizar el diseño estructural de mi casa?</summary><p>Con los planos arquitectónicos (aunque sean preliminares), la ubicación del terreno y el número de niveles podemos darte una cotización. Si cuentas con estudio de mecánica de suelos, compártelo también.</p></details>
+        <details><summary>¿Los planos sirven para tramitar la licencia de construcción?</summary><p>Sí. Entregamos planos estructurales y memoria de cálculo con el formato que piden las autoridades, y te apoyamos con la firma de responsable cuando aplica.</p></details>
+        <details><summary>¿Cuánto tarda el proyecto estructural?</summary><p>Una casa habitación típica de uno o dos niveles se entrega en 1 a 3 semanas, según el tamaño y la información disponible.</p></details>
+        <details><summary>¿La IA reemplaza el criterio del ingeniero?</summary><p>No. Las herramientas que implementamos automatizan tareas repetitivas y señalan posibles errores; las decisiones de diseño y la firma siguen siendo del ingeniero responsable.</p></details>
+        <details><summary>¿Cómo se licencian los programas?</summary><p>Ofrecemos licencias por usuario. Escríbenos y te enviamos precios, requisitos del equipo y una demostración.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contacto -->
+  <section class="block" id="contacto">
+    <div class="wrap contact-grid">
+      <div>
+        <div class="sec-head" style="margin-bottom: 0">
+          <span class="label">Contacto</span>
+          <h2>Cuéntanos tu proyecto</h2>
+          <p>Respondemos en menos de 24 horas hábiles con los siguientes pasos y, cuando aplica, una cotización.</p>
+        </div>
+        <ul class="contact-list">
+          <li><span class="k">Correo</span><span class="v ph-data" id="c-email">contacto@tudominio.com</span></li>
+          <li><span class="k">Teléfono / WhatsApp</span><span class="v ph-data" id="c-tel">+52 000 000 0000</span></li>
+          <li><span class="k">Ubicación</span><span class="v ph-data">Ciudad, Estado</span></li>
+          <li><span class="k">Horario</span><span class="v">Lunes a viernes, 9:00 a 18:00</span></li>
+        </ul>
+      </div>
+
+      <form class="form" id="form" novalidate>
+        <div class="tabs" role="group" aria-label="Tipo de solicitud">
+          <button type="button" id="tab-casa" data-tab="casa" aria-pressed="true">Diseño de casa</button>
+          <button type="button" id="tab-ia" data-tab="ia" aria-pressed="false">IA para mi despacho</button>
+          <button type="button" id="tab-software" data-tab="software" aria-pressed="false">Software</button>
+        </div>
+
+        <div class="row">
+          <div class="field"><label for="f-nombre">Nombre</label><input id="f-nombre" name="nombre" autocomplete="name" required><span class="err" hidden>Escribe tu nombre.</span></div>
+          <div class="field"><label for="f-email">Correo</label><input id="f-email" name="email" type="email" autocomplete="email" required><span class="err" hidden>Escribe un correo válido, por ejemplo nombre@correo.com.</span></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="f-tel">Teléfono <span class="opt">(opcional)</span></label><input id="f-tel" name="telefono" type="tel" autocomplete="tel"></div>
+          <div class="field"><label for="f-ciudad">Ciudad</label><input id="f-ciudad" name="ciudad" autocomplete="address-level2" required><span class="err" hidden>Indica la ciudad del proyecto o de tu despacho.</span></div>
+        </div>
+
+        <div class="row" data-for="casa">
+          <div class="field"><label for="f-tipo">Tipo de obra</label>
+            <select id="f-tipo" name="tipo_obra"><option>Casa nueva</option><option>Ampliación o segundo nivel</option><option>Revisión de estructura existente</option></select></div>
+          <div class="row" style="gap: var(--s-3)">
+            <div class="field"><label for="f-m2">m² aprox.</label><input id="f-m2" name="m2" type="number" min="0" inputmode="numeric" placeholder="120"></div>
+            <div class="field"><label for="f-niveles">Niveles</label><select id="f-niveles" name="niveles"><option>1</option><option selected>2</option><option>3</option><option>4 o más</option></select></div>
+          </div>
+        </div>
+        <div class="field" data-for="ia" hidden>
+          <label for="f-equipo">Tamaño del equipo</label>
+          <select id="f-equipo" name="equipo"><option>Trabajo solo</option><option>2 a 5 ingenieros</option><option>6 a 20 ingenieros</option><option>Más de 20</option></select>
+        </div>
+        <div class="field" data-for="software" hidden>
+          <label for="f-producto">Herramienta de interés</label>
+          <select id="f-producto" name="producto"><option>Trabes y losas de concreto</option><option>Muros de mampostería</option><option>Espectros de diseño sísmico</option><option>Desarrollo a la medida</option></select>
+        </div>
+
+        <div class="field"><label for="f-msg" id="msg-label">Describe tu proyecto</label><textarea id="f-msg" name="mensaje" required></textarea><span class="err" hidden>Cuéntanos un poco más para poder ayudarte.</span></div>
+
+        <button class="btn btn-primary" type="submit" id="submit-btn">Preparar solicitud</button>
+        <p class="form-note">Usamos tus datos solo para responder a esta solicitud.</p>
+
+        <div class="result" id="result" hidden aria-live="polite">
+          <h3>Tu solicitud está lista</h3>
+          <p>Elige cómo enviárnosla. Se abrirá tu correo o WhatsApp con el mensaje ya escrito.</p>
+          <div class="acts">
+            <a class="btn btn-primary" id="send-mail" href="#" target="_blank" rel="noopener">Enviar por correo</a>
+            <a class="btn btn-line" id="send-wa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+            <button type="button" class="btn btn-line" id="copy-btn">Copiar mensaje</button>
+          </div>
+          <p id="copy-status" aria-live="polite"></p>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <img src="assets/sems-logo-white.png" alt="SEMS Engineering, Structures, Management" width="46" height="46">
+        <p>Structural Engineering Management Systems. Diseño estructural, servicios de ingeniería y software especializado.</p>
+      </div>
+      <div>
+        <h4>Servicios</h4>
+        <ul><li><a href="#casa">Diseño de casa habitación</a></li><li><a href="#ia">IA para ingenieros</a></li><li><a href="#software">Software de diseño</a></li></ul>
+      </div>
+      <div>
+        <h4>Contacto</h4>
+        <ul><li class="ph-data">contacto@tudominio.com</li><li class="ph-data">+52 000 000 0000</li><li class="ph-data">Ciudad, Estado</li></ul>
+      </div>
+    </div>
+    <div class="foot-bottom"><span>© <span id="year">2026</span> SEMS. Todos los derechos reservados.</span><span>Ingeniería · Estructuras · Gestión</span></div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // Datos de contacto: reemplazar con los reales
+  var CONTACT = { email: "contacto@tudominio.com", whatsapp: "520000000000" };
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  // Menú móvil
+  var menuBtn = document.getElementById("menu-btn"), nav = document.getElementById("nav");
+  menuBtn.addEventListener("click", function () {
+    var open = nav.dataset.open !== "true";
+    nav.dataset.open = String(open);
+    menuBtn.setAttribute("aria-expanded", String(open));
+  });
+  nav.addEventListener("click", function (e) { if (e.target.closest("a")) { nav.dataset.open = "false"; menuBtn.setAttribute("aria-expanded", "false"); } });
+
+  // Pestañas del formulario
+  var labels = { casa: "Describe tu proyecto", ia: "¿Qué tareas te gustaría automatizar?", software: "¿Qué necesitas diseñar o calcular?" };
+  var asunto = { casa: "Cotización de diseño estructural", ia: "Diagnóstico de IA para mi despacho", software: "Información de software" };
+  var current = "casa";
+  function setTab(t) {
+    current = t;
+    document.querySelectorAll(".tabs button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.tab === t)); });
+    document.querySelectorAll("[data-for]").forEach(function (el) { el.hidden = el.dataset.for !== t; });
+    document.getElementById("msg-label").textContent = labels[t];
+    document.getElementById("result").hidden = true;
+  }
+  document.querySelectorAll(".tabs button").forEach(function (b) { b.addEventListener("click", function () { setTab(b.dataset.tab); }); });
+  document.querySelectorAll("a[data-perfil]").forEach(function (a) {
+    a.addEventListener("click", function () {
+      setTab(a.dataset.perfil);
+      if (a.dataset.producto) document.getElementById("f-producto").value = a.dataset.producto;
+    });
+  });
+
+  // Validación y armado del mensaje
+  var form = document.getElementById("form"), message = "";
+  function check(id, ok) {
+    var field = document.getElementById(id).closest(".field");
+    field.dataset.invalid = String(!ok);
+    field.querySelector(".err").hidden = ok;
+    return ok;
+  }
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var v = function (id) { return document.getElementById(id).value.trim(); };
+    var ok = [
+      check("f-nombre", v("f-nombre").length > 1),
+      check("f-email", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v("f-email"))),
+      check("f-ciudad", v("f-ciudad").length > 1),
+      check("f-msg", v("f-msg").length > 5)
+    ].every(Boolean);
+    if (!ok) { var bad = form.querySelector('[data-invalid="true"] input, [data-invalid="true"] textarea'); if (bad) bad.focus(); return; }
+
+    var lines = [asunto[current], "", "Nombre: " + v("f-nombre"), "Correo: " + v("f-email")];
+    if (v("f-tel")) lines.push("Teléfono: " + v("f-tel"));
+    lines.push("Ciudad: " + v("f-ciudad"));
+    if (current === "casa") {
+      lines.push("Tipo de obra: " + v("f-tipo"), "Superficie aprox.: " + (v("f-m2") || "sin dato") + " m²", "Niveles: " + v("f-niveles"));
+    } else if (current === "ia") {
+      lines.push("Tamaño del equipo: " + v("f-equipo"));
+    } else {
+      lines.push("Herramienta: " + v("f-producto"));
+    }
+    lines.push("", v("f-msg"));
+    message = lines.join("\n");
+
+    document.getElementById("send-mail").href = "mailto:" + CONTACT.email + "?subject=" + encodeURIComponent(asunto[current]) + "&body=" + encodeURIComponent(message);
+    document.getElementById("send-wa").href = "https://wa.me/" + CONTACT.whatsapp + "?text=" + encodeURIComponent(message);
+    document.getElementById("copy-status").textContent = "";
+    var r = document.getElementById("result"); r.hidden = false;
+    r.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+  form.querySelectorAll("input, textarea").forEach(function (el) {
+    el.addEventListener("input", function () { var f = el.closest(".field"); if (f.dataset.invalid === "true") { f.dataset.invalid = "false"; f.querySelector(".err").hidden = true; } });
+  });
+
+  document.getElementById("copy-btn").addEventListener("click", function () {
+    var status = document.getElementById("copy-status");
+    var done = function () { status.textContent = "Mensaje copiado. Pégalo en un correo a " + CONTACT.email + "."; };
+    var fallback = function () { status.textContent = message; };
+    try { navigator.clipboard.writeText(message).then(done, fallback); } catch (err) { fallback(); }
+  });
+})();
+</script>
+
+</body>
+</html>
