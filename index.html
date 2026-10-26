@@ -187,7 +187,7 @@ section.block { padding-block: var(--s-9); position: relative; }
 .product li::before { content: ""; width: .5rem; height: .5rem; margin-top: .55rem; background: var(--glow); border-radius: 1px; }
 .product-foot { padding: var(--s-4) var(--s-5) var(--s-5); display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); flex-wrap: wrap; }
 .price { font-family: var(--f-mono); font-size: .9rem; color: var(--muted); }
-.price b { font-family: var(--f-display); font-size: 1.25rem; color: var(--fg); font-weight: 700; }
+.price b { font-family: var(--f-display); font-size: 1rem; color: var(--fg); font-weight: 700; }
 .product .btn { padding: .55em 1em; font-size: .9rem; }
 .soft-note { margin-top: var(--s-5); color: var(--muted); font-size: .95rem; }
 
@@ -214,7 +214,8 @@ section.block { padding-block: var(--s-9); position: relative; }
 .contact-list { list-style: none; margin: var(--s-5) 0 0; padding: 0; display: grid; gap: var(--s-4); }
 .contact-list li { display: grid; gap: .1rem; }
 .contact-list .k { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-.contact-list .v { font-weight: 600; font-size: 1.05rem; user-select: all; overflow-wrap: anywhere; }
+.contact-list .v { font-weight: 600; font-size: 1.05rem; overflow-wrap: anywhere; text-decoration: none; }
+.contact-list a.v:hover { color: var(--steel); text-decoration: underline; }
 .form { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s-6); display: grid; gap: var(--s-4); }
 .tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .tabs button { font: inherit; font-size: .88rem; font-weight: 600; padding: .7rem .5rem; background: transparent; color: var(--muted); border: 0; border-right: 1px solid var(--line); cursor: pointer; line-height: 1.25; }
@@ -252,7 +253,6 @@ section.block { padding-block: var(--s-9); position: relative; }
 .foot-bottom { border-top: 1px solid rgba(169, 187, 209, .2); padding-top: var(--s-4); display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s-3); font-size: .85rem; font-family: var(--f-mono); }
 
 /* Placeholder visible para datos pendientes */
-.ph-data { background: color-mix(in srgb, var(--glow) 18%, transparent); border-radius: 2px; padding: 0 .25em; }
 
 /* Entrada del hero */
 @keyframes rise { from { transform: translateY(14px); opacity: .001; } to { transform: none; opacity: 1; } }
@@ -421,7 +421,7 @@ section.block { padding-block: var(--s-9); position: relative; }
             <li>Revisión de deflexiones y agrietamiento</li>
             <li>Reporte en PDF con referencias a la norma</li>
           </ul>
-          <div class="product-foot"><span class="price">Desde <b>$ —</b></span><a class="btn btn-line" href="#contacto" data-perfil="software" data-producto="Trabes y losas de concreto">Solicitar licencia</a></div>
+          <div class="product-foot"><span class="price"><b>Precio bajo pedido</b></span><a class="btn btn-line" href="#contacto" data-perfil="software" data-producto="Trabes y losas de concreto">Solicitar licencia</a></div>
         </article>
         <article class="product">
           <div class="product-top">
@@ -434,7 +434,7 @@ section.block { padding-block: var(--s-9); position: relative; }
             <li>Diseño de castillos y dalas</li>
             <li>Ideal para casa habitación de 1 a 3 niveles</li>
           </ul>
-          <div class="product-foot"><span class="price">Desde <b>$ —</b></span><a class="btn btn-line" href="#contacto" data-perfil="software" data-producto="Muros de mampostería">Solicitar licencia</a></div>
+          <div class="product-foot"><span class="price"><b>Precio bajo pedido</b></span><a class="btn btn-line" href="#contacto" data-perfil="software" data-producto="Muros de mampostería">Solicitar licencia</a></div>
         </article>
         <article class="product">
           <div class="product-top">
@@ -447,7 +447,7 @@ section.block { padding-block: var(--s-9); position: relative; }
             <li>Exportación a tu programa de análisis</li>
             <li>Gráficas listas para la memoria de cálculo</li>
           </ul>
-          <div class="product-foot"><span class="price">Desde <b>$ —</b></span><a class="btn btn-line" href="#contacto" data-perfil="software" data-producto="Espectros de diseño sísmico">Solicitar licencia</a></div>
+          <div class="product-foot"><span class="price"><b>Precio bajo pedido</b></span><a class="btn btn-line" href="#contacto" data-perfil="software" data-producto="Espectros de diseño sísmico">Solicitar licencia</a></div>
         </article>
       </div>
       <p class="soft-note">¿Necesitas una herramienta a la medida de tu despacho? También desarrollamos software personalizado. <a href="#contacto" data-perfil="software">Cuéntanos qué necesitas</a>.</p>
@@ -499,9 +499,9 @@ section.block { padding-block: var(--s-9); position: relative; }
           <p>Respondemos en menos de 24 horas hábiles con los siguientes pasos y, cuando aplica, una cotización.</p>
         </div>
         <ul class="contact-list">
-          <li><span class="k">Correo</span><span class="v ph-data" id="c-email">contacto@tudominio.com</span></li>
-          <li><span class="k">Teléfono / WhatsApp</span><span class="v ph-data" id="c-tel">+52 000 000 0000</span></li>
-          <li><span class="k">Ubicación</span><span class="v ph-data">Ciudad, Estado</span></li>
+          <li><span class="k">Correo</span><a class="v" id="c-email" href="mailto:sems.structures@gmail.com">sems.structures@gmail.com</a></li>
+          <li><span class="k">Teléfono / WhatsApp</span><a class="v" id="c-tel" href="https://wa.me/526611964186" target="_blank" rel="noopener">+52 661 196 4186</a></li>
+          <li><span class="k">Ubicación</span><span class="v">Tijuana, Baja California, México</span></li>
           <li><span class="k">Horario</span><span class="v">Lunes a viernes, 9:00 a 18:00</span></li>
         </ul>
       </div>
@@ -572,7 +572,7 @@ section.block { padding-block: var(--s-9); position: relative; }
       </div>
       <div>
         <h4>Contacto</h4>
-        <ul><li class="ph-data">contacto@tudominio.com</li><li class="ph-data">+52 000 000 0000</li><li class="ph-data">Ciudad, Estado</li></ul>
+        <ul><li><a href="mailto:sems.structures@gmail.com">sems.structures@gmail.com</a></li><li><a href="https://wa.me/526611964186" target="_blank" rel="noopener">WhatsApp +52 661 196 4186</a></li><li>Tijuana, Baja California, México</li></ul>
       </div>
     </div>
     <div class="foot-bottom"><span>© <span id="year">2026</span> SEMS. Todos los derechos reservados.</span><span>Ingeniería · Estructuras · Gestión</span></div>
@@ -581,8 +581,8 @@ section.block { padding-block: var(--s-9); position: relative; }
 
 <script>
 (function () {
-  // Datos de contacto: reemplazar con los reales
-  var CONTACT = { email: "contacto@tudominio.com", whatsapp: "520000000000" };
+  // Datos de contacto
+  var CONTACT = { email: "sems.structures@gmail.com", whatsapp: "526611964186" };
 
   document.getElementById("year").textContent = new Date().getFullYear();
 

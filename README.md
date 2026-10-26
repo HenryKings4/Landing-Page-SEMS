@@ -8,5 +8,5 @@ Sitio estático de SEMS (Structural Engineering Management Systems), listo para 
 ## Publicar en GitHub Pages
 Settings → Pages → Source: "Deploy from a branch" → rama `main`, carpeta `/ (root)` → Save.
 
-## Datos a editar
-Busca `contacto@tudominio.com`, `+52 000 000 0000` y `Ciudad, Estado` en `index.html`, y la constante `CONTACT` al final del archivo (correo y WhatsApp sin signos ni espacios).
+## Datos de contacto
+Correo, WhatsApp y ubicación aparecen en la sección de contacto y en el pie de página de `index.html`, y en la constante `CONTACT` al final del archivo (WhatsApp con código de país, sin signos ni espacios).
